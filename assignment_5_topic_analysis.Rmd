@@ -8,33 +8,43 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE,
+                      message = FALSE, 
+                      warning = FALSE)
 ```
 
 ```{r packages, message=FALSE, warning=FALSE}
-library(forcats)
-library(ggplot2)
-library(ggraph)
-library(here)
-library(igraph) #network plots
-library(ldatuning)
-library(LDAvis)
-library(lubridate) #working with date data
-library(pdftools)
-library(quanteda)
-library(quanteda.textstats)
-library(quanteda.textplots)
-library(readr)
-library(readtext) #quanteda subpackage for reading pdf
-library(reshape2)
-library(stringr)
-library(tidyr) #text analysis in R
-library(tidytext)
-library(tidyverse)
-library(tm)
-library(topicmodels)
-library("tsne")
-library(widyr) # pairwise correlations
+#install packages if necessary, then load libraries
+if (!require(librarian)){
+  install.packages("librarian")
+  library(librarian)
+}
+
+librarian::shelf(
+  forcats, 
+  ggplot2,
+  ggraph,
+  here,
+  igraph, #network plots
+  ldatuning,
+  LDAvis,
+  lubridate,
+  pdftools,
+  quanteda,
+  quanteda.textstats,
+  quanteda.texplots,
+  readr,
+  readtext, #quanted subpackage for reading pdfs
+  reshape2,
+  stringr,
+  tidyr,
+  tidytext,
+  tidyverse,
+  tm,
+  topicmodels,
+  "tsne",
+  widyr
+  )
 ```
 
 ```{r}
