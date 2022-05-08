@@ -1,7 +1,7 @@
 ---
-title: "assignment_5_topic_analysis"
-author: "Marie Rivers"
-date: '2022-05-05'
+title: "Topic 6: Topic Analysis"
+author: "Felicia Cruz, Mia Forsline, Cullen Molitor, Marie Rivers"
+date: '2022-05-10'
 output:
   pdf_document: default
   html_document: default
