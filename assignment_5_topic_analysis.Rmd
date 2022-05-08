@@ -26,6 +26,7 @@ librarian::shelf(
   ggraph,
   here,
   igraph, #network plots
+  kableExtra,
   ldatuning,
   LDAvis,
   lubridate,
@@ -47,38 +48,74 @@ librarian::shelf(
   )
 ```
 
+# Read in the data from PDF files in the "data" directory 
+
 ```{r}
-files <- list.files(path = here("movie_scripts"),
+#character of full file paths for each PDF in the data folder 
+files <- list.files(path = here("data"),
                     pattern = "pdf$", full.names = TRUE)
+#create a list
+scripts <- lapply(files, pdf_text)
 
-movie_scripts <- lapply(files, pdf_text)
-
-movie_scripts_pdf <- readtext(file = here("movie_scripts", "*.pdf"),
+#create a readtext/dataframe of all PDF scripts 
+scripts_pdf <- readtext(file = here("data", "*.pdf"),
                               docvarsfrom = c("metadata", "filenames", "filepaths"),
                               sep = "_")
+```
 
+# Create a clean corpus 
+```{r}
 #creating an initial corpus containing our data
-script_corp <- corpus(x = movie_scripts_pdf, text_field = "text" )
+script_corp <- corpus(x = scripts_pdf, text_field = "text" )
+
+#check the corpus 
 summary(script_corp) %>% 
   knitr::kable(caption = "Summary of Movie Script Corpus")
 ```
 
+Add additional, context-specific stop words to stop word lexicon
 ```{r}
-toks <- tokens(script_corp, remove_punct = TRUE, remove_numbers = TRUE)
+# more_stops <-c("2015",
+#                "2016", 
+#                "2017", 
+#                "2018", 
+#                "2019", 
+#                "2020", 
+#                "www.epa.gov", 
+#                "https")
+# add_stops <- tibble(word = c(stop_words$word, more_stops)) 
+# stop_vec <- as_vector(add_stops)
+```
 
-# xxx...add custome stop words such as character names from Don't Look Up
+Tokenize the data into single words and remove stop words 
+```{r}
+toks <- tokens(script_corp, 
+               remove_punct = TRUE, 
+               remove_numbers = TRUE)
+
+# xxx...add custom stop words such as character names from "Don't Look Up"
 add_stops <- c(stopwords("en"),"xxx", "yyy", "zzz")
+
 toks1 <- tokens_select(toks, pattern = add_stops, selection = "remove")
 ```
 
-Convert to a document-feature matrix
+
+
+# Convert to a document-feature matrix (dfm)
 ```{r}
 dfm_comm <- dfm(toks1, tolower = TRUE)
 dfm <- dfm_wordstem(dfm_comm)
-dfm <- dfm_trim(dfm, min_docfreq = 2) #remove terms only appearing in one doc (min_termfreq = 10)
+dfm <- dfm_trim(dfm, 
+                min_docfreq = 2) #keep terms that appear in at least 2 documents 
 
-print(head(dfm))
+dfm %>% 
+  kbl() %>% 
+  kable_styling(bootstrap_options = c("striped", "hover"),
+                latex_options = "HOLD_position") #hold the table position when knitting
 ```
+
+
+
 
 ```{r}
 #remove rows (docs) with all zeros...for the topic model you can't have zeros
