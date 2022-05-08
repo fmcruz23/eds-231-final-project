@@ -30,6 +30,7 @@ librarian::shelf(
   ldatuning,
   LDAvis,
   lubridate,
+  palettetown,
   pdftools,
   quanteda,
   quanteda.textstats,
@@ -193,7 +194,7 @@ top_terms %>%
   coord_flip()
 ```
 
-# Assign topic names 
+# Assign topic names based on the first 5 words 
 
 ```{r}
 top5termsPerTopic <- terms(topicModel_k7, 5)
@@ -232,14 +233,16 @@ vizDataFrame <- melt(cbind(data.frame(topicProportionExamples),
 # Plot the distribution of each topic over each document 
 
 ```{r}
-ggplot(data = vizDataFrame, aes(topic, value, fill = document), ylab = "proportion") +
+ggplot(data = vizDataFrame, aes(topic, value, fill = document)) +
   geom_bar(stat="identity") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +  
   coord_flip() +
-  facet_wrap(~ document, ncol = N)
-# named topics based on first 5 words
-# first column show prevalence of each topic in the 1st document
-# 1, 2, 3 are the 1st, 2nd, and 3rd documents and the plot shows how each topic is distributed within each document
+  facet_wrap(~ document, ncol = N) + 
+  labs(y = "Topic Distribution", 
+       x = "Topic Name",
+       fill = "Film") + 
+  scale_fill_poke(pokemon = 137, spread = 3) + 
+  theme_classic()
 ```
 
 Here’s a neat JSON-based model visualizer
@@ -248,6 +251,7 @@ Here’s a neat JSON-based model visualizer
 #library(LDAvis)
 #library("tsne")
 svd_tsne <- function(x) tsne(svd(x)$u)
+
 json <- createJSON(
   phi = tmResult$terms, 
   theta = tmResult$topics, 
