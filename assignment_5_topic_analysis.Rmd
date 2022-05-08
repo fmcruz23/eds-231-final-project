@@ -104,7 +104,8 @@ toks1 <- tokens_select(toks, pattern = add_stops, selection = "remove")
 dfm_comm <- dfm(toks1, tolower = TRUE)
 dfm <- dfm_wordstem(dfm_comm)
 dfm <- dfm_trim(dfm, 
-                min_docfreq = 2) #keep terms that appear in at least 2 documents 
+                min_docfreq = 3, #keep terms that appear in at least 3 documents 
+                min_termfreq = 1) #keep terms that appear at least once
 
 dfm %>% 
   kbl() %>% 
@@ -115,6 +116,11 @@ Remove rows (AKA documents) with all zeroes - otherwise the topic model won't wo
 ```{r}
 sel_idx <- slam::row_sums(dfm) > 0 
 dfm <- dfm[sel_idx, ]
+
+dfm %>% 
+  kbl() %>% 
+  kable_styling(bootstrap_options = c("striped", "hover"),
+                latex_options = "HOLD_position") #hold the table position when knitting
 ```
 
 # Choose a number of latent topics (k)
