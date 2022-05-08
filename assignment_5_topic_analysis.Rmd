@@ -123,7 +123,7 @@ dfm %>%
                 latex_options = "HOLD_position") #hold the table position when knitting
 ```
 
-# Choose a number of latent topics (k)
+# Choose a number of latent topics (k) and run the Gibbs topic analysis 
 
 ```{r}
 k <- 7 #k is the number of topics
@@ -134,28 +134,20 @@ topicModel_k7 <- LDA(dfm,
                      control=list(iter = 500, verbose = 25))
 ```
 
-View the results 
 
 ```{r}
-#nTerms(dfm_comm) 
-
 tmResult <- posterior(topicModel_k7)
-attributes(tmResult)
-```
-
-View the beta from the results 
-
-```{r}
-#nTerms(dfm_comm)   
+#attributes(tmResult) #terms and topics 
+ 
 beta <- tmResult$terms   # get beta from results
-dim(beta)                # K distributions over nTerms(DTM) terms# lengthOfVocab
+#dim(beta)                # K distributions over nTerms(DTM) terms 
+
+terms(topicModel_k7, 10) #view the terms from each topic 
 ```
 
-View the terms from each topics 
+# Calculate metrics from the data 
 
-```{r}
-terms(topicModel_k7, 10)
-```
+It seems like 7 topics is the ideal number 
 
 ```{r}
 result <- FindTopicsNumber(
@@ -169,12 +161,15 @@ result <- FindTopicsNumber(
 
 FindTopicsNumber_plot(result)
 ```
+# ?? 
 
 ```{r}
 theta <- tmResult$topics
 beta <- tmResult$terms
 vocab <- (colnames(beta))
 ```
+
+Note that the beta value indicates how likely a term is to be in that particular topic 
 
 ```{r}
 comment_topics <- tidy(topicModel_k7, matrix = "beta")
@@ -186,8 +181,8 @@ top_terms <- comment_topics %>%
   arrange(topic, -beta)
 
 top_terms
-# beta is the probability of a term in a topic...highest beta or words most likely to be in topic
 ```
+# Graph the most likely words per topic 
 
 ```{r}
 top_terms %>%
@@ -198,31 +193,45 @@ top_terms %>%
   coord_flip()
 ```
 
-Assign names to the topics so we know what we are working with. We can name them by their top terms
+# Assign topic names 
 
 ```{r}
 top5termsPerTopic <- terms(topicModel_k7, 5)
 topicNames <- apply(top5termsPerTopic, 2, paste, collapse=" ")
 ```
 
-We can explore the theta matrix, which contains the distribution of each topic over each document
+# Explore the theta matrix 
+
+The theta matrix contains the distribution of each topic over each document
 
 ```{r}
 exampleIds <- c(1, 2, 3)
 N <- length(exampleIds)
-```
 
-```{r}
 #lapply(epa_corp[exampleIds], as.character) #uncomment to view example text
 # get topic proportions form example documents
+
 topicProportionExamples <- theta[exampleIds,]
+
 colnames(topicProportionExamples) <- topicNames
-rownames(topicProportionExamples) <- c("Before the Flood", "Don't Look Up", "Inconvient Truth")
-vizDataFrame <- melt(cbind(data.frame(topicProportionExamples), document=factor(1:N)), variable.name = "topic", id.vars = "document")  %>% 
-  mutate(document = case_when(
+
+rownames(topicProportionExamples) <- c("Before the Flood", 
+                                       "Don't Look Up", 
+                                       "Inconvient Truth")
+
+vizDataFrame <- melt(cbind(data.frame(topicProportionExamples),
+                           document=factor(1:N)), 
+                           variable.name = "topic", 
+                           id.vars = "document")  %>% 
+    mutate(document = case_when(
     document == 1 ~ "Before the Flood",
     document == 2 ~ "Don't Look Up",
     document == 3 ~ "Inconvient Truth"))
+```
+
+# Plot the distribution of each topic over each document 
+
+```{r}
 ggplot(data = vizDataFrame, aes(topic, value, fill = document), ylab = "proportion") +
   geom_bar(stat="identity") +
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +  
@@ -236,8 +245,8 @@ ggplot(data = vizDataFrame, aes(topic, value, fill = document), ylab = "proporti
 Here’s a neat JSON-based model visualizer
 
 ```{r}
-library(LDAvis)
-library("tsne")
+#library(LDAvis)
+#library("tsne")
 svd_tsne <- function(x) tsne(svd(x)$u)
 json <- createJSON(
   phi = tmResult$terms, 
