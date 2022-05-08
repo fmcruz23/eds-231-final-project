@@ -99,8 +99,6 @@ add_stops <- c(stopwords("en"),"xxx", "yyy", "zzz")
 toks1 <- tokens_select(toks, pattern = add_stops, selection = "remove")
 ```
 
-
-
 # Convert to a document-feature matrix (dfm)
 ```{r}
 dfm_comm <- dfm(toks1, tolower = TRUE)
@@ -113,15 +111,44 @@ dfm %>%
   kable_styling(bootstrap_options = c("striped", "hover"),
                 latex_options = "HOLD_position") #hold the table position when knitting
 ```
-
-
-
-
+Remove rows (AKA documents) with all zeroes - otherwise the topic model won't work 
 ```{r}
-#remove rows (docs) with all zeros...for the topic model you can't have zeros
 sel_idx <- slam::row_sums(dfm) > 0 
 dfm <- dfm[sel_idx, ]
-#comments_df <- dfm[sel_idx, ]
+```
+
+# Choose a number of latent topics (k)
+
+```{r}
+k <- 7 #k is the number of topics
+
+topicModel_k7 <- LDA(dfm, 
+                     k, 
+                     method="Gibbs", 
+                     control=list(iter = 500, verbose = 25))
+```
+
+View the results 
+
+```{r}
+#nTerms(dfm_comm) 
+
+tmResult <- posterior(topicModel_k7)
+attributes(tmResult)
+```
+
+View the beta from the results 
+
+```{r}
+#nTerms(dfm_comm)   
+beta <- tmResult$terms   # get beta from results
+dim(beta)                # K distributions over nTerms(DTM) terms# lengthOfVocab
+```
+
+View the terms from each topics 
+
+```{r}
+terms(topicModel_k7, 10)
 ```
 
 ```{r}
@@ -136,30 +163,6 @@ result <- FindTopicsNumber(
 
 FindTopicsNumber_plot(result)
 ```
-
-```{r}
-k <- 7 # k is the number of topics
-
-topicModel_k7 <- LDA(dfm, k, method="Gibbs", control=list(iter = 500, verbose = 25))
-```
-
-```{r}
-#nTerms(dfm_comm) 
-
-tmResult <- posterior(topicModel_k7)
-attributes(tmResult)
-```
-
-```{r}
-#nTerms(dfm_comm)   
-beta <- tmResult$terms   # get beta from results
-dim(beta)                # K distributions over nTerms(DTM) terms# lengthOfVocab
-```
-
-```{r}
-terms(topicModel_k7, 10)
-```
-
 
 ```{r}
 theta <- tmResult$topics
