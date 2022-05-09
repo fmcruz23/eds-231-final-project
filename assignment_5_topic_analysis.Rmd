@@ -178,6 +178,20 @@ result <- FindTopicsNumber(
 
 FindTopicsNumber_plot(result)
 ```
+## Deveaud2014 method 
+
+```{r}
+result <- FindTopicsNumber(
+  dfm,
+  topics = seq(from = 2, to = 20, by = 1),
+  metrics = c("CaoJuan2009", "Deveaud2014"),
+  method = "Gibbs",
+  control = list(seed = 77),
+  verbose = TRUE
+)
+
+FindTopicsNumber_plot(result)
+```
 
 
 # Extract theta and beta values 
