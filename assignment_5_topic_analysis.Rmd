@@ -13,6 +13,10 @@ knitr::opts_chunk$set(echo = TRUE,
                       warning = FALSE)
 ```
 
+```{r, include=FALSE}
+options(tinytex.verbose = TRUE)
+```
+
 ```{r packages, message=FALSE, warning=FALSE}
 #install packages if necessary, then load libraries
 if (!require(librarian)){

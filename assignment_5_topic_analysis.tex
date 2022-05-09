@@ -197,7 +197,7 @@ directory}\label{read-in-the-data-from-pdf-files-in-the-data-directory}}
 
 \begin{table}
 
-\caption{\label{tab:unnamed-chunk-2}Summary of Movie Script Corpus}
+\caption{\label{tab:unnamed-chunk-3}Summary of Movie Script Corpus}
 \centering
 \begin{tabular}[t]{l|r|r|r}
 \hline
@@ -362,17 +362,17 @@ analysis}\label{choose-a-number-of-latent-topics-k-and-run-the-gibbs-topic-analy
 \end{Shaded}
 
 \begin{verbatim}
-##       Topic 1  Topic 2     Topic 3   Topic 4  Topic 5   Topic 6  Topic 7 
-##  [1,] "presid" "just"      "world"   "peopl"  "year"    "know"   "earth" 
-##  [2,] "orlean" "time"      "chang"   "see"    "ice"     "now"    "one"   
-##  [3,] "look"   "back"      "come"    "thing"  "go"      "right"  "like"  
-##  [4,] "go"     "show"      "much"    "like"   "warm"    "will"   "lot"   
-##  [5,] "oh"     "well"      "today"   "make"   "one"     "can"    "use"   
-##  [6,] "two"    "scientist" "can"     "start"  "problem" "say"    "first" 
-##  [7,] "got"    "day"       "last"    "live"   "ocean"   "like"   "nation"
-##  [8,] "night"  "new"       "power"   "point"  "water"   "realli" "half"  
-##  [9,] "cut"    "big"       "kind"    "enough" "look"    "get"    "set"   
-## [10,] "tell"   "happen"    "percent" "place"  "way"     "think"  "way"
+##       Topic 1 Topic 2 Topic 3  Topic 4  Topic 5     Topic 6   Topic 7
+##  [1,] "chang" "peopl" "get"    "go"     "year"      "presid"  "just" 
+##  [2,] "way"   "like"  "take"   "time"   "one"       "orlean"  "us"   
+##  [3,] "power" "see"   "realli" "now"    "ice"       "look"    "said" 
+##  [4,] "today" "can"   "much"   "back"   "warm"      "just"    "also" 
+##  [5,] "fact"  "will"  "say"    "earth"  "earth"     "know"    "can"  
+##  [6,] "level" "know"  "come"   "new"    "problem"   "got"     "two"  
+##  [7,] "everi" "world" "day"    "day"    "water"     "night"   "cours"
+##  [8,] "want"  "think" "tri"    "well"   "atmospher" "want"    "move" 
+##  [9,] "keep"  "now"   "thing"  "us"     "last"      "continu" "help" 
+## [10,] "use"   "start" "first"  "pictur" "went"      "right"   "next"
 \end{verbatim}
 
 \hypertarget{calculate-metrics-from-the-data}{%
@@ -411,7 +411,7 @@ It seems like 7 topics is the ideal number
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{assignment_5_topic_analysis_files/figure-latex/unnamed-chunk-9-1.pdf}
+\includegraphics{assignment_5_topic_analysis_files/figure-latex/unnamed-chunk-10-1.pdf}
 \#\# Griffiths2004 \& CaoJuan2009 method
 
 \begin{Shaded}
@@ -440,7 +440,7 @@ It seems like 7 topics is the ideal number
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{assignment_5_topic_analysis_files/figure-latex/unnamed-chunk-10-1.pdf}
+\includegraphics{assignment_5_topic_analysis_files/figure-latex/unnamed-chunk-11-1.pdf}
 \#\# Deveaud2014 method
 
 \begin{Shaded}
@@ -469,7 +469,7 @@ It seems like 7 topics is the ideal number
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{assignment_5_topic_analysis_files/figure-latex/unnamed-chunk-11-1.pdf}
+\includegraphics{assignment_5_topic_analysis_files/figure-latex/unnamed-chunk-12-1.pdf}
 
 \hypertarget{extract-theta-and-beta-values}{%
 \section{Extract theta and beta
@@ -501,20 +501,20 @@ particular topic
 \end{Shaded}
 
 \begin{verbatim}
-## # A tibble: 71 x 3
-##    topic term     beta
-##    <int> <chr>   <dbl>
-##  1     1 presid 0.0646
-##  2     1 orlean 0.0476
-##  3     1 look   0.0445
-##  4     1 go     0.0352
-##  5     1 oh     0.0217
-##  6     1 two    0.0217
-##  7     1 got    0.0205
-##  8     1 night  0.0205
-##  9     1 cut    0.0182
-## 10     1 tell   0.0178
-## # ... with 61 more rows
+## # A tibble: 76 x 3
+##    topic term    beta
+##    <int> <chr>  <dbl>
+##  1     1 chang 0.0811
+##  2     1 way   0.0355
+##  3     1 power 0.0264
+##  4     1 today 0.0254
+##  5     1 fact  0.0244
+##  6     1 level 0.0204
+##  7     1 everi 0.0193
+##  8     1 want  0.0193
+##  9     1 keep  0.0193
+## 10     1 use   0.0183
+## # ... with 66 more rows
 \end{verbatim}
 
 \hypertarget{graph-the-most-likely-words-per-topic}{%
@@ -532,7 +532,7 @@ topic}\label{graph-the-most-likely-words-per-topic}}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{assignment_5_topic_analysis_files/figure-latex/unnamed-chunk-14-1.pdf}
+\includegraphics{assignment_5_topic_analysis_files/figure-latex/unnamed-chunk-15-1.pdf}
 
 \hypertarget{assign-topic-names-based-on-the-first-5-words}{%
 \section{Assign topic names based on the first 5
@@ -597,7 +597,7 @@ document}\label{plot-the-distribution-of-each-topic-over-each-document}}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{assignment_5_topic_analysis_files/figure-latex/unnamed-chunk-17-1.pdf}
+\includegraphics{assignment_5_topic_analysis_files/figure-latex/unnamed-chunk-18-1.pdf}
 
 Here's a neat JSON-based model visualizer
 

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.5.8)  8 MAY 2022 17:23
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2022.5.8)  8 MAY 2022 17:25
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -436,8 +436,7 @@ Package: makecell 2009/08/03 V0.1e Managing of Tab Column Heads and Cells
 File: l3backend-pdftex.def 2022-04-20 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count308
 \l__pdf_internal_box=\box72
-)
-No file assignment_5_topic_analysis.aux.
+) (./assignment_5_topic_analysis.aux)
 \openout1 = `assignment_5_topic_analysis.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 124.
@@ -477,6 +476,7 @@ Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 LaTeX Info: Redefining \ref on input line 124.
 LaTeX Info: Redefining \pageref on input line 124.
 LaTeX Info: Redefining \nameref on input line 124.
+(./assignment_5_topic_analysis.out) (./assignment_5_topic_analysis.out)
 \@outlinefile=\write4
 \openout4 = `assignment_5_topic_analysis.out'.
 
@@ -571,15 +571,15 @@ l.251 \begin{Shaded}
 Runaway definition?
 ->\hskip \col@sep \setbox \z@ \hbox \bgroup \bgroup \CT@everycr {}\d@llarbegin \ETC.
 ! TeX capacity exceeded, sorry [main memory size=5000000].
-\@preamble ... 193\relax \d@llarend \do@row@strut 
-                                                  \egroup \egroup \begingrou...
+\@preamble ...r \CT@do@color \endgroup \@tempdima 
+                                                  \ht \z@ \advance \@tempdim...
 l.268 ...|r|r|r|r|r|r|r|r|r|r|r|r|r|r|r|r|r|r|r|r}
                                                    
 Here is how much of TeX's memory you used:
- 12688 strings out of 480260
- 201047 string characters out of 5893587
+ 12700 strings out of 480260
+ 201364 string characters out of 5893587
  5000001 words of memory out of 5000000
- 30369 multiletter control sequences out of 15000+600000
+ 30375 multiletter control sequences out of 15000+600000
  509920 words of font info for 69 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  60i,9n,63p,1173b,927s stack positions out of 10000i,1000n,20000p,200000b,200000s
