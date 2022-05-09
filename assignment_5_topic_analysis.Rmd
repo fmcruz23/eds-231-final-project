@@ -148,6 +148,8 @@ terms(topicModel_k7, 10) #view the terms from each topic
 
 # Calculate metrics from the data 
 
+## CaoJuan 2009 & Deveaud2014 method 
+
 It seems like 7 topics is the ideal number 
 
 ```{r}
@@ -162,7 +164,23 @@ result <- FindTopicsNumber(
 
 FindTopicsNumber_plot(result)
 ```
-# ?? 
+## Griffiths2004 & CaoJuan2009 method 
+
+```{r}
+result <- FindTopicsNumber(
+  dfm,
+  topics = seq(from = 2, to = 20, by = 1),
+  metrics = c("CaoJuan2009", "Griffiths2004"),
+  method = "Gibbs",
+  control = list(seed = 77),
+  verbose = TRUE
+)
+
+FindTopicsNumber_plot(result)
+```
+
+
+# Extract theta and beta values 
 
 ```{r}
 theta <- tmResult$topics
