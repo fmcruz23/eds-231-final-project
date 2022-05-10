@@ -25,8 +25,6 @@ if (!require(librarian)){
 }
 
 librarian::shelf(
-  forcats, 
-  ggplot2,
   ggraph,
   here,
   igraph, #network plots
@@ -38,17 +36,14 @@ librarian::shelf(
   pdftools,
   quanteda,
   quanteda.textstats,
-  quanteda.texplots,
-  readr,
+  quanteda.textplots,
   readtext, #quanted subpackage for reading pdfs
   reshape2,
-  stringr,
-  tidyr,
   tidytext,
   tidyverse,
   tm,
   topicmodels,
-  "tsne",
+  tsne,
   widyr
   )
 ```
@@ -112,20 +107,20 @@ dfm <- dfm_trim(dfm,
                 min_docfreq = 3, #keep terms that appear in at least 3 documents 
                 min_termfreq = 1) #keep terms that appear at least once
 
-dfm %>% 
-  kbl() %>% 
-  kable_styling(bootstrap_options = c("striped", "hover"),
-                latex_options = "HOLD_position") #hold the table position when knitting
+# dfm %>% 
+  # kbl() %>%
+  # kable_styling(bootstrap_options = c("striped", "hover"),
+  # latex_options = "HOLD_position") #hold the table position when knitting
 ```
 Remove rows (AKA documents) with all zeroes - otherwise the topic model won't work 
 ```{r}
 sel_idx <- slam::row_sums(dfm) > 0 
 dfm <- dfm[sel_idx, ]
 
-dfm %>% 
-  kbl() %>% 
-  kable_styling(bootstrap_options = c("striped", "hover"),
-                latex_options = "HOLD_position") #hold the table position when knitting
+# dfm %>% 
+  # kbl() %>%
+  # kable_styling(bootstrap_options = c("striped", "hover"),
+  # latex_options = "HOLD_position") #hold the table position when knitting
 ```
 
 # Choose a number of latent topics (k) and run the Gibbs topic analysis 
@@ -271,28 +266,26 @@ vizDataFrame <- melt(cbind(data.frame(topicProportionExamples),
 ```{r}
 ggplot(data = vizDataFrame, aes(topic, value, fill = document)) +
   geom_bar(stat="identity") +
-  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +  
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
   coord_flip() +
-  facet_wrap(~ document, ncol = N) + 
-  labs(y = "Topic Distribution", 
+  facet_wrap(~ document, ncol = N) +
+  labs(y = "Topic Distribution",
        x = "Topic Name",
-       fill = "Film") + 
-  scale_fill_poke(pokemon = 137, spread = 3) + 
+       fill = "Film") +
+  scale_fill_poke(pokemon = 137, spread = 3) +
   theme_classic()
 ```
 
 Here’s a neat JSON-based model visualizer
 
-```{r}
-#library(LDAvis)
-#library("tsne")
+```{r }
 svd_tsne <- function(x) tsne(svd(x)$u)
 
 json <- createJSON(
-  phi = tmResult$terms, 
-  theta = tmResult$topics, 
-  doc.length = rowSums(dfm), 
-  vocab = colnames(dfm), 
+  phi = tmResult$terms,
+  theta = tmResult$topics,
+  doc.length = rowSums(dfm),
+  vocab = colnames(dfm),
   term.frequency = colSums(dfm),
   mds.method = svd_tsne,
   plot.opts = list(xlab="", ylab="")
