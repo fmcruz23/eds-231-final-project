@@ -6,8 +6,8 @@
 ]{article}
 \usepackage{amsmath,amssymb}
 \usepackage{lmodern}
-\usepackage{iftex}
-\ifPDFTeX
+\usepackage{ifxetex,ifluatex}
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
   \usepackage[T1]{fontenc}
   \usepackage[utf8]{inputenc}
   \usepackage{textcomp} % provide euro and other symbols
@@ -113,7 +113,7 @@
 \usepackage[normalem]{ulem}
 \usepackage{makecell}
 \usepackage{xcolor}
-\ifLuaTeX
+\ifluatex
   \usepackage{selnolig}  % disable illegal ligatures
 \fi
 
@@ -362,17 +362,17 @@ analysis}\label{choose-a-number-of-latent-topics-k-and-run-the-gibbs-topic-analy
 \end{Shaded}
 
 \begin{verbatim}
-##       Topic 1 Topic 2 Topic 3  Topic 4  Topic 5     Topic 6   Topic 7
-##  [1,] "chang" "peopl" "get"    "go"     "year"      "presid"  "just" 
-##  [2,] "way"   "like"  "take"   "time"   "one"       "orlean"  "us"   
-##  [3,] "power" "see"   "realli" "now"    "ice"       "look"    "said" 
-##  [4,] "today" "can"   "much"   "back"   "warm"      "just"    "also" 
-##  [5,] "fact"  "will"  "say"    "earth"  "earth"     "know"    "can"  
-##  [6,] "level" "know"  "come"   "new"    "problem"   "got"     "two"  
-##  [7,] "everi" "world" "day"    "day"    "water"     "night"   "cours"
-##  [8,] "want"  "think" "tri"    "well"   "atmospher" "want"    "move" 
-##  [9,] "keep"  "now"   "thing"  "us"     "last"      "continu" "help" 
-## [10,] "use"   "start" "first"  "pictur" "went"      "right"   "next"
+##       Topic 1     Topic 2 Topic 3     Topic 4  Topic 5  Topic 6  Topic 7
+##  [1,] "earth"     "year"  "just"      "presid" "like"   "chang"  "know" 
+##  [2,] "one"       "ice"   "much"      "orlean" "thing"  "world"  "say"  
+##  [3,] "new"       "one"   "atmospher" "look"   "peopl"  "can"    "want" 
+##  [4,] "work"      "warm"  "earth"     "time"   "now"    "today"  "go"   
+##  [5,] "big"       "time"  "way"       "just"   "realli" "come"   "oh"   
+##  [6,] "actual"    "water" "day"       "go"     "will"   "look"   "yeah" 
+##  [7,] "see"       "go"    "everi"     "day"    "see"    "use"    "get"  
+##  [8,] "us"        "ocean" "part"      "two"    "think"  "start"  "call" 
+##  [9,] "show"      "lot"   "ever"      "tell"   "even"   "kind"   "now"  
+## [10,] "scientist" "last"  "side"      "night"  "right"  "believ" "need"
 \end{verbatim}
 
 \hypertarget{calculate-metrics-from-the-data}{%
@@ -416,32 +416,21 @@ It seems like 7 topics is the ideal number
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\NormalTok{result }\OtherTok{\textless{}{-}} \FunctionTok{FindTopicsNumber}\NormalTok{(}
-\NormalTok{  dfm,}
-  \AttributeTok{topics =} \FunctionTok{seq}\NormalTok{(}\AttributeTok{from =} \DecValTok{2}\NormalTok{, }\AttributeTok{to =} \DecValTok{20}\NormalTok{, }\AttributeTok{by =} \DecValTok{1}\NormalTok{),}
-  \AttributeTok{metrics =} \FunctionTok{c}\NormalTok{(}\StringTok{"CaoJuan2009"}\NormalTok{, }\StringTok{"Griffiths2004"}\NormalTok{),}
-  \AttributeTok{method =} \StringTok{"Gibbs"}\NormalTok{,}
-  \AttributeTok{control =} \FunctionTok{list}\NormalTok{(}\AttributeTok{seed =} \DecValTok{77}\NormalTok{),}
-  \AttributeTok{verbose =} \ConstantTok{TRUE}
-\NormalTok{)}
+\CommentTok{\# result \textless{}{-} FindTopicsNumber(}
+\CommentTok{\#   dfm,}
+\CommentTok{\#   topics = seq(from = 2, to = 20, by = 1),}
+\CommentTok{\#   metrics = c("CaoJuan2009", "Griffiths2004"),}
+\CommentTok{\#   method = "Gibbs",}
+\CommentTok{\#   control = list(seed = 77),}
+\CommentTok{\#   verbose = TRUE}
+\CommentTok{\# )}
+\CommentTok{\# }
+\CommentTok{\# FindTopicsNumber\_plot(result)}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{verbatim}
-## fit models... done.
-## calculate metrics:
-##   CaoJuan2009... done.
-##   Griffiths2004... done.
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{FindTopicsNumber\_plot}\NormalTok{(result)}
-\end{Highlighting}
-\end{Shaded}
-
-\includegraphics{assignment_5_topic_analysis_files/figure-latex/unnamed-chunk-11-1.pdf}
-\#\# Deveaud2014 method
+\hypertarget{deveaud2014-method}{%
+\subsection{Deveaud2014 method}\label{deveaud2014-method}}
 
 \begin{Shaded}
 \begin{Highlighting}[]
@@ -501,20 +490,20 @@ particular topic
 \end{Shaded}
 
 \begin{verbatim}
-## # A tibble: 76 x 3
-##    topic term    beta
-##    <int> <chr>  <dbl>
-##  1     1 chang 0.0811
-##  2     1 way   0.0355
-##  3     1 power 0.0264
-##  4     1 today 0.0254
-##  5     1 fact  0.0244
-##  6     1 level 0.0204
-##  7     1 everi 0.0193
-##  8     1 want  0.0193
-##  9     1 keep  0.0193
-## 10     1 use   0.0183
-## # ... with 66 more rows
+## # A tibble: 72 x 3
+##    topic term        beta
+##    <int> <chr>      <dbl>
+##  1     1 earth     0.0417
+##  2     1 one       0.0370
+##  3     1 new       0.0361
+##  4     1 work      0.0297
+##  5     1 big       0.0278
+##  6     1 actual    0.0278
+##  7     1 see       0.0241
+##  8     1 us        0.0232
+##  9     1 show      0.0223
+## 10     1 scientist 0.0223
+## # ... with 62 more rows
 \end{verbatim}
 
 \hypertarget{graph-the-most-likely-words-per-topic}{%

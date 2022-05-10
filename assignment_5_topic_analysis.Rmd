@@ -2,9 +2,9 @@
 title: "Topic 6: Topic Analysis"
 author: "Felicia Cruz, Mia Forsline, Cullen Molitor, Marie Rivers"
 date: '2022-05-10'
-output:
-  pdf_document: default
-  html_document: default
+output: 
+  pdf_document: default 
+  html_document: default 
 ---
 
 ```{r setup, include=FALSE}
@@ -14,7 +14,7 @@ knitr::opts_chunk$set(echo = TRUE,
 ```
 
 ```{r, include=FALSE}
-options(tinytex.verbose = TRUE)
+# options(tinytex.verbose = TRUE)
 ```
 
 ```{r packages, message=FALSE, warning=FALSE}
