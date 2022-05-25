@@ -1,0 +1,293 @@
+---
+title: "Movie Script Keyness"
+author: "Marie Rivers"
+date: '2022-05-12'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyr) #text analysis in R
+library(pdftools)
+library(lubridate) #working with date data
+library(tidyverse)
+library(tidytext)
+library(readr)
+library(quanteda)
+library(readtext) #quanteda subpackage for reading pdf
+library(quanteda.textstats)
+library(quanteda.textplots)
+library(ggplot2)
+library(forcats)
+library(stringr)
+library(quanteda.textplots)
+library(widyr)# pairwise correlations
+library(igraph) #network plots
+library(ggraph)
+library(here)
+library(patchwork)
+```
+
+```{r pdf_import}
+files <- list.files(path = here("data"),
+                    pattern = "pdf$", full.names = TRUE)
+
+scripts <- lapply(files, pdf_text)
+
+scripts_pdf <- readtext(file = here("data", "*.pdf"), 
+                   docvarsfrom = "filenames", 
+                   docvarnames = c("title1", "title2", "title3"),
+                   sep = NULL) # this isn't doing what I want it to do
+#creating an initial corpus containing our data
+scripts_corp <- corpus(x = scripts_pdf, text_field = "text" )
+summary(scripts_corp) %>% 
+  knitr::kable(caption = "Summary of Scripts Corpus")
+```
+```{r}
+# Add some additional, context-specific stop words to stop word lexicon
+more_stops <-c("randall", "kate", "dr", "president", "int", "oglethorpe", "jason", "brie", "orlean")
+add_stops <- tibble(word = c(stop_words$word, more_stops))
+stop_vec <- as_vector(add_stops)
+```
+
+xxx...look up code to remove numbers
+
+Create different data objects that will be used for the subsequent analyses
+```{r tidy}
+#convert to tidy format and apply my stop words
+raw_text <- tidy(scripts_corp)
+
+#Distribution of most frequent words across documents
+raw_words <- raw_text %>%
+  mutate(title = as.factor(title)) %>%
+  mutate(title = case_when(title == "dont" ~ "dont_look_up",
+                           title == "an" ~ "an_inconvenient_truth",
+                           title == "before" ~ "before_the_flood")) %>% 
+  unnest_tokens(word, text) %>%
+  anti_join(add_stops, by = 'word') %>%
+  count(title, word, sort = TRUE)
+```
+
+```{r}
+#number of total words by document  
+total_words <- raw_words %>%
+  group_by(title) %>%
+  summarize(total = sum(n))
+
+script_words <- left_join(raw_words, total_words)
+
+par_tokens <- unnest_tokens(raw_text, output = paragraphs, input = text, token = "paragraphs")
+
+par_tokens <- par_tokens %>%
+ mutate(par_id = 1:n())
+
+par_words <- unnest_tokens(par_tokens, output = word, input = paragraphs, token = "words") %>% 
+  mutate(title = case_when(title == "dont" ~ "dont_look_up",
+                           title == "an" ~ "an_inconvenient_truth",
+                           title == "before" ~ "before_the_flood"))
+```
+
+```{r}
+tokens <- tokens(scripts_corp, remove_punct = TRUE)
+toks1<- tokens_select(tokens, min_nchar = 3)
+toks1 <- tokens_tolower(toks1)
+toks1 <- tokens_remove(toks1, pattern = (stop_vec))
+dfm <- dfm(toks1)
+
+dfm$full_title <- c("an_inconvenient_truth", "before_the_flood", "dont_look_up")
+docvars(dfm)
+```
+
+```{r}
+par_words_inconvenient_truth <- par_words %>% 
+  filter(title == "an_inconvenient_truth")
+
+par_words_before_the_flood <- par_words %>% 
+  filter(title == "before_the_flood")
+
+par_words_dont_look_up <- par_words %>% 
+  filter(title == "dont_look_up")
+```
+
+```{r corr_paragraphs}
+word_cors_all <- par_words %>% 
+  add_count(par_id) %>% 
+  filter(n >= 50) %>% 
+  select(-n) %>%
+  pairwise_cor(word, par_id, sort = TRUE)
+
+word_cors_inconvenient_truth <- par_words_inconvenient_truth %>% 
+  add_count(par_id) %>% 
+  filter(n >= 50) %>% 
+  select(-n) %>%
+  pairwise_cor(word, par_id, sort = TRUE)
+
+word_cors_before_the_flood <- par_words_before_the_flood %>% 
+  add_count(par_id) %>% 
+  filter(n >= 50) %>% 
+  select(-n) %>%
+  pairwise_cor(word, par_id, sort = TRUE)
+
+word_cors_dont_look_up <- par_words_dont_look_up %>% 
+  add_count(par_id) %>% 
+  filter(n >= 50) %>% 
+  select(-n) %>%
+  pairwise_cor(word, par_id, sort = TRUE)
+```
+
+```{r}
+#first the basic frequency stat
+tstat_freq <- textstat_frequency(dfm, n = 5, groups = title)
+head(tstat_freq, 15) %>% 
+  knitr::kable(caption = "Subset of Top 5 Words")
+```
+
+```{r}
+#let's zoom in on just one of our key terms
+all_script_cors <- word_cors_all %>%
+  filter(item1 == "climate") %>%
+  mutate(n = 1:n())
+
+all_script_cors_plot <- all_script_cors  %>%
+  filter(n <= 30) %>%
+  graph_from_data_frame() %>%
+  ggraph(layout = "fr") +
+  geom_edge_link(aes(edge_alpha = correlation, edge_width = correlation), edge_colour = "steelblue3") +
+  geom_node_point(size = 4) +
+  geom_node_text(aes(label = name), repel = TRUE, 
+                 point.padding = unit(0.2, "lines")) +
+  theme_void()
+```
+you can compare the use of "climate" in the 2 documentations to see how this word is used differently, but don't look up never mentions the word climate or climate change
+```{r}
+#let's zoom in on just one of our key terms
+inconvenient_truth_cors <- word_cors_inconvenient_truth %>%
+  filter(item1 == "earth") %>%
+  mutate(n = 1:n())
+
+inconvenient_truth_cors_plot <- inconvenient_truth_cors %>%
+  filter(n <= 30) %>%
+  graph_from_data_frame() %>%
+  ggraph(layout = "fr") +
+  geom_edge_link(aes(edge_alpha = correlation, edge_width = correlation), edge_colour = "steelblue3") +
+  geom_node_point(size = 4) +
+  geom_node_text(aes(label = name), repel = TRUE, 
+                 point.padding = unit(0.2, "lines")) +
+  theme_void()
+```
+
+```{r}
+#let's zoom in on just one of our key terms
+before_the_flood_cors <- word_cors_before_the_flood %>%
+  filter(item1 == "earth") %>%
+  mutate(n = 1:n())
+
+before_the_flood_cors_plot <- before_the_flood_cors %>%
+  filter(n <= 30) %>%
+  graph_from_data_frame() %>%
+  ggraph(layout = "fr") +
+  geom_edge_link(aes(edge_alpha = correlation, edge_width = correlation), edge_colour = "steelblue3") +
+  geom_node_point(size = 4) +
+  geom_node_text(aes(label = name), repel = TRUE, 
+                 point.padding = unit(0.2, "lines")) +
+  theme_void()
+```
+
+```{r}
+# don't look up never mentions climate or climate change
+#let's zoom in on just one of our key terms
+dont_look_up_cors <-  word_cors_dont_look_up %>%
+  filter(item1 == "earth") %>%
+  mutate(n = 1:n())
+
+dont_look_up_cors  %>%
+  filter(n <= 30) %>%
+  graph_from_data_frame() %>%
+  ggraph(layout = "fr") +
+  geom_edge_link(aes(edge_alpha = correlation, edge_width = correlation), edge_colour = "steelblue3") +
+  geom_node_point(size = 4) +
+  geom_node_text(aes(label = name), repel = TRUE, 
+                 point.padding = unit(0.2, "lines")) +
+  theme_void()
+```
+xxx...revise to have climate and earth separated
+```{r}
+cors_plots <- all_script_cors_plot / (inconvenient_truth_cors_plot + before_the_flood_cors_plot)
+cors_plots
+```
+
+
+```{r corr_network}
+water_cors <- word_cors %>% 
+  filter(item1 == "water")
+
+  word_cors %>%
+  filter(item1 %in% c("water", "air", "health", "public"))%>%
+  group_by(item1) %>%
+  top_n(6) %>%
+  ungroup() %>%
+  mutate(item1 = as.factor(item1),
+  name = reorder_within(item2, correlation, item1)) %>%
+  ggplot(aes(y = name, x = correlation, fill = item1)) +
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~item1, ncol = 2, scales = "free")+
+  scale_y_reordered() +
+  labs(y = NULL,
+         x = NULL,
+         title = "Correlations with key words",
+         subtitle = "EPA EJ Reports")
+```
+
+
+```{r}
+dfm_test <- dfm %>% 
+  dfm_subset(docnames(before_the_flood.pdf))
+```
+
+```{r keyness function}
+keyness_function <- function(reference_report_title, target_report_title) {
+  files <- list.files(path = here("data"),
+                    pattern = "pdf$", full.names = TRUE)
+  scripts <- lapply(files, pdf_text)
+  scripts_pdf <- readtext(file = here("data", "*.pdf"), 
+                   docvarsfrom = "filenames", 
+                   docvarnames = c("title1", "title2", "title3"),
+                   sep = "_")
+  scripts_corp <- corpus(x = scripts_pdf, text_field = "text" )
+  tokens <- tokens(scripts_corp, remove_punct = TRUE)
+  toks1<- tokens_select(tokens, min_nchar = 3)
+  toks1 <- tokens_tolower(toks1)
+  toks1 <- tokens_remove(toks1, pattern = (stop_vec))
+  dfm <- dfm(toks1)
+  dfm$full_title <- c("an_inconvenient_truth", "before_the_flood", "dont_look_up")
+  
+  keyness_function_plot <- dfm %>% 
+    dfm_subset(full_title %in% c(reference_report_title, target_report_title)) %>% 
+    textstat_keyness(target = paste0(target_report_title, ".pdf")) %>% 
+    textplot_keyness()
+  keyness_function_plot
+}
+```
+
+```{r fig.height=5, fig.width=7}
+# an_inconvenient_truth vs. before_the_flood
+keyness_function(reference_report_title = "an_inconvenient_truth", target_report_title = "before_the_flood")
+```
+
+```{r fig.height=5, fig.width=7}
+# before_the_flood vs. an_inconvenient_truth
+keyness_function(reference_report_title = "before_the_flood", target_report_title = "an_inconvenient_truth")
+```
+
+```{r fig.height=5, fig.width=7}
+# an_inconvenient_truth vs. don't look up
+keyness_function(reference_report_title = "an_inconvenient_truth", target_report_title = "dont_look_up")
+```
+
+```{r fig.height=5, fig.width=7}
+# an_inconvenient_truth vs. don't look up
+keyness_function(reference_report_title = "before_the_flood", target_report_title = "dont_look_up")
+```
