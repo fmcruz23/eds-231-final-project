@@ -50,12 +50,10 @@ summary(scripts_corp) %>%
 ```
 ```{r}
 # Add some additional, context-specific stop words to stop word lexicon
-more_stops <-c("randall", "kate", "dr", "president", "int", "oglethorpe", "jason", "brie", "orlean")
+more_stops <-c("randall", "kate", "dr", "president", "int", "oglethorpe", "jason", "brie", "orlean", "page", "said", "also", "so", "does", "it's", "our", "not", "are", "on", "at", "kinda", "every", "any", "leonardo", "dicaprio", "leo", "uh", "i've", "am", "yes", "cont'd", "okay", "oh", "isherwill", "mindy", "bremmer", "dibiasky", "june", "calder", "i'm", "was")
 add_stops <- tibble(word = c(stop_words$word, more_stops))
 stop_vec <- as_vector(add_stops)
 ```
-
-xxx...look up code to remove numbers
 
 Create different data objects that will be used for the subsequent analyses
 ```{r tidy}
@@ -104,6 +102,10 @@ docvars(dfm)
 ```
 
 ```{r}
+dfm
+```
+
+```{r}
 par_words_inconvenient_truth <- par_words %>% 
   filter(title == "an_inconvenient_truth")
 
@@ -141,11 +143,6 @@ word_cors_dont_look_up <- par_words_dont_look_up %>%
 ```
 
 ```{r}
-dfm
-```
-
-
-```{r}
 #first the basic frequency stat
 tstat_freq <- textstat_frequency(dfm, n = 5, groups = title1)
 head(tstat_freq, 15) %>% 
@@ -171,11 +168,29 @@ all_script_cors_plot <- all_script_cors  %>%
 you can compare the use of "climate" in the 2 documentations to see how this word is used differently, but don't look up never mentions the word climate or climate change
 ```{r}
 #let's zoom in on just one of our key terms
-inconvenient_truth_cors <- word_cors_inconvenient_truth %>%
+inconvenient_truth_earth_cors <- word_cors_inconvenient_truth %>%
   filter(item1 == "earth") %>%
   mutate(n = 1:n())
 
-inconvenient_truth_cors_plot <- inconvenient_truth_cors %>%
+inconvenient_truth_earth_cors_plot <- inconvenient_truth_earth_cors %>%
+  filter(n <= 30) %>%
+  graph_from_data_frame() %>%
+  ggraph(layout = "fr") +
+  geom_edge_link(aes(edge_alpha = correlation, edge_width = correlation), edge_colour = "seagreen") +
+  geom_node_point(size = 4) +
+  geom_node_text(aes(label = name), repel = TRUE, 
+                 point.padding = unit(0.2, "lines")) +
+  theme_void() +
+  ggtitle("An Inconvenient Truth - earth")
+inconvenient_truth_earth_cors_plot
+```
+```{r}
+#let's zoom in on just one of our key terms
+inconvenient_truth_climate_cors <- word_cors_inconvenient_truth %>%
+  filter(item1 == "climate") %>%
+  mutate(n = 1:n())
+
+inconvenient_truth_climate_cors_plot <- inconvenient_truth_climate_cors %>%
   filter(n <= 30) %>%
   graph_from_data_frame() %>%
   ggraph(layout = "fr") +
@@ -183,16 +198,56 @@ inconvenient_truth_cors_plot <- inconvenient_truth_cors %>%
   geom_node_point(size = 4) +
   geom_node_text(aes(label = name), repel = TRUE, 
                  point.padding = unit(0.2, "lines")) +
-  theme_void()
+  theme_void() +
+  ggtitle("An Inconvenient Truth - climate")
+inconvenient_truth_climate_cors_plot
 ```
 
 ```{r}
 #let's zoom in on just one of our key terms
-before_the_flood_cors <- word_cors_before_the_flood %>%
+inconvenient_truth_time_cors <- word_cors_inconvenient_truth %>%
+  filter(item1 == "time") %>%
+  mutate(n = 1:n())
+
+inconvenient_truth_time_cors_plot <- inconvenient_truth_time_cors %>%
+  filter(n <= 30) %>%
+  graph_from_data_frame() %>%
+  ggraph(layout = "fr") +
+  geom_edge_link(aes(edge_alpha = correlation, edge_width = correlation), edge_colour = "firebrick") +
+  geom_node_point(size = 4) +
+  geom_node_text(aes(label = name), repel = TRUE, 
+                 point.padding = unit(0.2, "lines")) +
+  theme_void() +
+  ggtitle("An Inconvenient Truth - climate")
+inconvenient_truth_time_cors_plot
+```
+
+```{r}
+#let's zoom in on just one of our key terms
+before_the_flood_earth_cors <- word_cors_before_the_flood %>%
   filter(item1 == "earth") %>%
   mutate(n = 1:n())
 
-before_the_flood_cors_plot <- before_the_flood_cors %>%
+before_the_flood_earth_cors_plot <- before_the_flood_earth_cors %>%
+  filter(n <= 30) %>%
+  graph_from_data_frame() %>%
+  ggraph(layout = "fr") +
+  geom_edge_link(aes(edge_alpha = correlation, edge_width = correlation), edge_colour = "seagreen") +
+  geom_node_point(size = 4) +
+  geom_node_text(aes(label = name), repel = TRUE, 
+                 point.padding = unit(0.2, "lines")) +
+  theme_void() +
+  ggtitle("Before the Flood - earth")
+before_the_flood_earth_cors_plot
+```
+
+```{r}
+#let's zoom in on just one of our key terms
+before_the_flood_climate_cors <- word_cors_before_the_flood %>%
+  filter(item1 == "climate") %>%
+  mutate(n = 1:n())
+
+before_the_flood_climate_cors_plot <- before_the_flood_climate_cors %>%
   filter(n <= 30) %>%
   graph_from_data_frame() %>%
   ggraph(layout = "fr") +
@@ -200,30 +255,83 @@ before_the_flood_cors_plot <- before_the_flood_cors %>%
   geom_node_point(size = 4) +
   geom_node_text(aes(label = name), repel = TRUE, 
                  point.padding = unit(0.2, "lines")) +
-  theme_void()
+  theme_void() +
+  ggtitle("Before the Flood - climate")
+before_the_flood_climate_cors_plot
+```
+
+```{r}
+#let's zoom in on just one of our key terms
+before_the_flood_time_cors <- word_cors_before_the_flood %>%
+  filter(item1 == "time") %>%
+  mutate(n = 1:n())
+
+before_the_flood_time_cors_plot <- before_the_flood_time_cors %>%
+  filter(n <= 30) %>%
+  graph_from_data_frame() %>%
+  ggraph(layout = "fr") +
+  geom_edge_link(aes(edge_alpha = correlation, edge_width = correlation), edge_colour = "firebrick") +
+  geom_node_point(size = 4) +
+  geom_node_text(aes(label = name), repel = TRUE, 
+                 point.padding = unit(0.2, "lines")) +
+  theme_void() +
+  ggtitle("Before the Flood - time")
+before_the_flood_time_cors_plot
 ```
 
 ```{r}
 # don't look up never mentions climate or climate change
 #let's zoom in on just one of our key terms
-dont_look_up_cors <-  word_cors_dont_look_up %>%
+dont_look_up_earth_cors <-  word_cors_dont_look_up %>%
   filter(item1 == "earth") %>%
   mutate(n = 1:n())
 
-dont_look_up_cors  %>%
+dont_look_up_earth_cors_plot <- dont_look_up_earth_cors %>%
   filter(n <= 30) %>%
   graph_from_data_frame() %>%
   ggraph(layout = "fr") +
-  geom_edge_link(aes(edge_alpha = correlation, edge_width = correlation), edge_colour = "steelblue3") +
+  geom_edge_link(aes(edge_alpha = correlation, edge_width = correlation), edge_colour = "seagreen") +
   geom_node_point(size = 4) +
   geom_node_text(aes(label = name), repel = TRUE, 
                  point.padding = unit(0.2, "lines")) +
-  theme_void()
+  theme_void() +
+  ggtitle("Don't Look Up - earth")
+dont_look_up_earth_cors_plot
 ```
-xxx...revise to have climate and earth separated
+
 ```{r}
-cors_plots <- all_script_cors_plot / (inconvenient_truth_cors_plot + before_the_flood_cors_plot)
-cors_plots
+# don't look up never mentions climate or climate change
+#let's zoom in on just one of our key terms
+dont_look_up_time_cors <-  word_cors_dont_look_up %>%
+  filter(item1 == "time") %>%
+  mutate(n = 1:n())
+
+dont_look_up_time_cors_plot <- dont_look_up_time_cors %>%
+  filter(n <= 30) %>%
+  graph_from_data_frame() %>%
+  ggraph(layout = "fr") +
+  geom_edge_link(aes(edge_alpha = correlation, edge_width = correlation), edge_colour = "firebrick") +
+  geom_node_point(size = 4) +
+  geom_node_text(aes(label = name), repel = TRUE, 
+                 point.padding = unit(0.2, "lines")) +
+  theme_void() +
+  ggtitle("Don't Look Up - time")
+dont_look_up_time_cors_plot
+```
+
+```{r fig.height=5, fig.width=7}
+earth_cors_plots <- (inconvenient_truth_earth_cors_plot + before_the_flood_earth_cors_plot + dont_look_up_earth_cors_plot)
+earth_cors_plots
+```
+
+```{r fig.height=5, fig.width=7}
+climate_cors_plots <- (inconvenient_truth_climate_cors_plot + before_the_flood_climate_cors_plot)
+climate_cors_plots
+```
+
+```{r fig.height=5, fig.width=7}
+time_cors_plots <- (inconvenient_truth_time_cors_plot + before_the_flood_time_cors_plot + dont_look_up_time_cors_plot)
+time_cors_plots
 ```
 
 
@@ -271,3 +379,17 @@ keyness_function(reference_report_title = "an_inconvenient_truth", target_report
 # an_inconvenient_truth vs. don't look up
 keyness_function(reference_report_title = "before_the_flood", target_report_title = "dont_look_up")
 ```
+
+```{r fig.height=10, fig.width=15}
+# wordcloud
+textplot_wordcloud(
+  dfm, 
+  comparison = T, 
+  max_words = 300, 
+  color = c("dodgerblue", "darkgreen", "red"),
+  labeloffset = .1
+)
+```
+
+
+
