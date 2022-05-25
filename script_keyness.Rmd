@@ -50,7 +50,7 @@ summary(scripts_corp) %>%
 ```
 ```{r}
 # Add some additional, context-specific stop words to stop word lexicon
-more_stops <-c("randall", "kate", "dr", "president", "int", "oglethorpe", "jason", "brie", "orlean", "page", "said", "also", "so", "does", "it's", "our", "not", "are", "on", "at", "kinda", "every", "any", "leonardo", "dicaprio", "leo", "uh", "i've", "am", "yes", "cont'd", "okay", "oh", "isherwill", "mindy", "bremmer", "dibiasky", "june", "calder", "i'm", "was")
+more_stops <-c("randall", "kate", "dr", "president", "int", "oglethorpe", "jason", "brie", "orlean", "page", "said", "also", "so", "does", "it's", "our", "not", "are", "on", "at", "kinda", "every", "any", "leonardo", "dicaprio", "leo", "uh", "i've", "am", "yes", "cont'd", "okay", "oh", "isherwell", "mindy", "bremmer", "dibiasky", "june", "calder", "i'm", "was")
 add_stops <- tibble(word = c(stop_words$word, more_stops))
 stop_vec <- as_vector(add_stops)
 ```
@@ -87,7 +87,8 @@ par_tokens <- par_tokens %>%
 par_words <- unnest_tokens(par_tokens, output = word, input = paragraphs, token = "words") %>% 
   mutate(title = case_when(title1 == "dont" ~ "dont_look_up",
                            title1 == "an" ~ "an_inconvenient_truth",
-                           title1 == "before" ~ "before_the_flood"))
+                           title1 == "before" ~ "before_the_flood")) %>% 
+  anti_join(add_stops, by = 'word')
 ```
 
 ```{r}
@@ -119,25 +120,25 @@ par_words_dont_look_up <- par_words %>%
 ```{r corr_paragraphs}
 word_cors_all <- par_words %>% 
   add_count(par_id) %>% 
-  filter(n >= 50) %>% 
+  filter(n >= 25) %>% 
   select(-n) %>%
   pairwise_cor(word, par_id, sort = TRUE)
 
 word_cors_inconvenient_truth <- par_words_inconvenient_truth %>% 
   add_count(par_id) %>% 
-  filter(n >= 50) %>% 
+  filter(n >= 25) %>% 
   select(-n) %>%
   pairwise_cor(word, par_id, sort = TRUE)
 
 word_cors_before_the_flood <- par_words_before_the_flood %>% 
   add_count(par_id) %>% 
-  filter(n >= 50) %>% 
+  filter(n >= 25) %>% 
   select(-n) %>%
   pairwise_cor(word, par_id, sort = TRUE)
 
 word_cors_dont_look_up <- par_words_dont_look_up %>% 
   add_count(par_id) %>% 
-  filter(n >= 50) %>% 
+  filter(n >= 25) %>% 
   select(-n) %>%
   pairwise_cor(word, par_id, sort = TRUE)
 ```
@@ -163,7 +164,9 @@ all_script_cors_plot <- all_script_cors  %>%
   geom_node_point(size = 4) +
   geom_node_text(aes(label = name), repel = TRUE, 
                  point.padding = unit(0.2, "lines")) +
-  theme_void()
+  theme_void() +
+  ggtitle("Both Documentaries - climate")
+all_script_cors_plot
 ```
 you can compare the use of "climate" in the 2 documentations to see how this word is used differently, but don't look up never mentions the word climate or climate change
 ```{r}
@@ -319,19 +322,25 @@ dont_look_up_time_cors_plot <- dont_look_up_time_cors %>%
 dont_look_up_time_cors_plot
 ```
 
-```{r fig.height=5, fig.width=7}
+```{r fig.height=5, fig.width=8}
 earth_cors_plots <- (inconvenient_truth_earth_cors_plot + before_the_flood_earth_cors_plot + dont_look_up_earth_cors_plot)
 earth_cors_plots
+
+ggsave(here("figs", "earth_cors_plots.png"), plot = earth_cors_plots)
 ```
 
-```{r fig.height=5, fig.width=7}
+```{r fig.height=5, fig.width=8}
 climate_cors_plots <- (inconvenient_truth_climate_cors_plot + before_the_flood_climate_cors_plot)
 climate_cors_plots
+
+ggsave(here("figs", "climate_cors_plots.png"), plot = climate_cors_plots)
 ```
 
-```{r fig.height=5, fig.width=7}
+```{r fig.height=5, fig.width=8}
 time_cors_plots <- (inconvenient_truth_time_cors_plot + before_the_flood_time_cors_plot + dont_look_up_time_cors_plot)
 time_cors_plots
+
+ggsave(here("figs", "time_cors_plots.png"), plot = time_cors_plots)
 ```
 
 
@@ -362,33 +371,45 @@ keyness_function <- function(reference_report_title, target_report_title) {
 
 ```{r fig.height=5, fig.width=7}
 # an_inconvenient_truth vs. before_the_flood
-keyness_function(reference_report_title = "an_inconvenient_truth", target_report_title = "before_the_flood")
+keyness_inconveniet_vs_before <- keyness_function(reference_report_title = "an_inconvenient_truth", target_report_title = "before_the_flood")
+keyness_inconveniet_vs_before
+
+ggsave(here("figs", "keyness_inconveniet_vs_before.png"), plot = keyness_inconveniet_vs_before)
 ```
 
 ```{r fig.height=5, fig.width=7}
 # before_the_flood vs. an_inconvenient_truth
-keyness_function(reference_report_title = "before_the_flood", target_report_title = "an_inconvenient_truth")
+#keyness_function(reference_report_title = "before_the_flood", target_report_title = "an_inconvenient_truth")
 ```
 
 ```{r fig.height=5, fig.width=7}
 # an_inconvenient_truth vs. don't look up
-keyness_function(reference_report_title = "an_inconvenient_truth", target_report_title = "dont_look_up")
+keyness_inconvenient_vs_dont <- keyness_function(reference_report_title = "an_inconvenient_truth", target_report_title = "dont_look_up")
+keyness_inconvenient_vs_dont
+
+ggsave(here("figs", "keyness_inconvenient_vs_dont.png"), plot = keyness_inconvenient_vs_dont)
 ```
 
 ```{r fig.height=5, fig.width=7}
 # an_inconvenient_truth vs. don't look up
-keyness_function(reference_report_title = "before_the_flood", target_report_title = "dont_look_up")
+keyness_before_vs_dont <- keyness_function(reference_report_title = "before_the_flood", target_report_title = "dont_look_up")
+keyness_before_vs_dont
+
+ggsave(here("figs", "keyness_before_vs_dont.png"), plot = keyness_before_vs_dont)
 ```
 
 ```{r fig.height=10, fig.width=15}
-# wordcloud
-textplot_wordcloud(
+# wordcloud with stop words removed
+wordcloud_no_stop_words <- textplot_wordcloud(
   dfm, 
   comparison = T, 
   max_words = 300, 
   color = c("dodgerblue", "darkgreen", "red"),
   labeloffset = .1
 )
+
+wordcloud_no_stop_words
+
 ```
 
 
