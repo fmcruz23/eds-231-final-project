@@ -112,6 +112,18 @@ dfm <- dfm_trim(dfm,
   # kable_styling(bootstrap_options = c("striped", "hover"),
   # latex_options = "HOLD_position") #hold the table position when knitting
 ```
+
+
+```{r fig.height=10, fig.width=15}
+textplot_wordcloud(
+  dfm, 
+  comparison = T, 
+  max_words = 300, 
+  color = c("dodgerblue", "darkgreen", "red"),
+  labeloffset = .1
+)
+```
+
 Remove rows (AKA documents) with all zeroes - otherwise the topic model won't work 
 ```{r}
 sel_idx <- slam::row_sums(dfm) > 0 
