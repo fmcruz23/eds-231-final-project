@@ -2,7 +2,9 @@
 title: "Movie Script Keyness"
 author: "Marie Rivers"
 date: '2022-05-12'
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -62,7 +64,7 @@ raw_text <- tidy(scripts_corp)
 
 #Distribution of most frequent words across documents
 raw_words <- raw_text %>%
-  mutate(title = as.factor(title)) %>%
+  mutate(title = as.factor(title1)) %>%
   mutate(title = case_when(title == "dont" ~ "dont_look_up",
                            title == "an" ~ "an_inconvenient_truth",
                            title == "before" ~ "before_the_flood")) %>% 
@@ -85,9 +87,9 @@ par_tokens <- par_tokens %>%
  mutate(par_id = 1:n())
 
 par_words <- unnest_tokens(par_tokens, output = word, input = paragraphs, token = "words") %>% 
-  mutate(title = case_when(title == "dont" ~ "dont_look_up",
-                           title == "an" ~ "an_inconvenient_truth",
-                           title == "before" ~ "before_the_flood"))
+  mutate(title = case_when(title1 == "dont" ~ "dont_look_up",
+                           title1 == "an" ~ "an_inconvenient_truth",
+                           title1 == "before" ~ "before_the_flood"))
 ```
 
 ```{r}
@@ -139,8 +141,13 @@ word_cors_dont_look_up <- par_words_dont_look_up %>%
 ```
 
 ```{r}
+dfm
+```
+
+
+```{r}
 #first the basic frequency stat
-tstat_freq <- textstat_frequency(dfm, n = 5, groups = title)
+tstat_freq <- textstat_frequency(dfm, n = 5, groups = title1)
 head(tstat_freq, 15) %>% 
   knitr::kable(caption = "Subset of Top 5 Words")
 ```
@@ -219,33 +226,6 @@ cors_plots <- all_script_cors_plot / (inconvenient_truth_cors_plot + before_the_
 cors_plots
 ```
 
-
-```{r corr_network}
-water_cors <- word_cors %>% 
-  filter(item1 == "water")
-
-  word_cors %>%
-  filter(item1 %in% c("water", "air", "health", "public"))%>%
-  group_by(item1) %>%
-  top_n(6) %>%
-  ungroup() %>%
-  mutate(item1 = as.factor(item1),
-  name = reorder_within(item2, correlation, item1)) %>%
-  ggplot(aes(y = name, x = correlation, fill = item1)) +
-  geom_col(show.legend = FALSE) +
-  facet_wrap(~item1, ncol = 2, scales = "free")+
-  scale_y_reordered() +
-  labs(y = NULL,
-         x = NULL,
-         title = "Correlations with key words",
-         subtitle = "EPA EJ Reports")
-```
-
-
-```{r}
-dfm_test <- dfm %>% 
-  dfm_subset(docnames(before_the_flood.pdf))
-```
 
 ```{r keyness function}
 keyness_function <- function(reference_report_title, target_report_title) {
